@@ -2,3 +2,5 @@ baseURL: "https://dhij.github.com.io/WenDai-Demo/"
 languageCode: en-us
 title: My New Hugo Site
 theme: PaperMod
+
+enableEmoji: true
