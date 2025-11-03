@@ -8,34 +8,29 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
         with:
           submodules: true
 
-      - name: Checkout destination
-        uses: actions/checkout@v3
-        if: github.ref == 'refs/heads/main'
-        with:
-          ref: gh-pages
-          path: built-site
-
       - name: Setup Hugo
         run: |
           curl -L -o /tmp/hugo.tar.gz 'https://github.com/gohugoio/hugo/releases/download/v0.152.2/hugo_extended_0.152.2_linux-amd64.tar.gz'
           tar -C ${RUNNER_TEMP} -zxvf /tmp/hugo.tar.gz hugo
+
       - name: Build
-        run: ${RUNNER_TEMP}/hugo
+        run: |
+          ${RUNNER_TEMP}/hugo
+          touch public/.nojekyll
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: |
-          touch public/.nojekyll
-          cp -R public/* ${GITHUB_WORKSPACE}/built-site/
-          cd ${GITHUB_WORKSPACE}/built-site
-          git add .
-          git config user.name 'Wendyddw'
-          git config user.email 'arielddw@gmail.com'
-          git commit -m 'Updated site'
-          git push
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          force_orphan: true
