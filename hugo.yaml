@@ -1,6 +1,6 @@
 baseURL: "https://wendyddw.github.io/WenDai-Demo/"
 languageCode: en-us
-title: My New Hugo Site
+title: Wen's Dev Playground
 theme: PaperMod
 
 enableEmoji: true
@@ -9,13 +9,15 @@ params:
   homeInfoParams:
     Title: "The dev playground"
     Content: >
-      Welcome to the **dev playground** 🎉
+      Welcome to the **dev playground** 🦄
 
-      - This is a space where I will mostly be sharing about Spark, large-scale data systems and other programming topics that I find interesting. 👀
+      - This is a space where I will mostly be sharing about Spark, large-scale data systems and other programming topics that I find interesting.
 
   socialIcons:
     - name: Github
       url: "https://github.com/Wendyddw"
+    - name: LinkedIn
+      url: "https://www.linkedin.com/in/wen-dai-613409137/"
 
   ShowReadingTime: true
   ShowShareButtons: true
