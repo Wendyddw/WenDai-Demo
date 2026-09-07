@@ -1,6 +1,6 @@
 baseURL: "https://wendai.dev/"
 languageCode: en-us
-title: Wen's Dev Playground
+title: "Wen Dai | Dev Playground"
 theme: PaperMod
 
 enableEmoji: true
@@ -11,7 +11,7 @@ params:
     Content: >
       Welcome to the **dev playground** 🦄
 
-      - This is a space where I will mostly be sharing about Spark, large-scale data systems and other programming topics that I find interesting.
+      - A space where I share what I’m learning and building with Spark, data engineering, and distributed systems.
 
   socialIcons:
     - name: Github
