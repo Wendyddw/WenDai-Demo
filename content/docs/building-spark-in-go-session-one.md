@@ -1,7 +1,7 @@
 ---
 date: 2026-09-06T00:00:00-07:00
 draft: false
-title: 'Building Spark in Go: Session One'
+title: 'Building Spark Core Execution Architecture in Go: Session One'
 description: 'Exploring Spark execution architecture through RDD lineage, stage planning, and concurrent task execution in Go.'
 categories:
   - 'Spark'
@@ -29,11 +29,11 @@ With these components in mind, we can walk through Spark’s core workflow. When
 
 Session one focuses on building an MVP Spark execution engine while exploring RDD lineage, lazy evaluation, narrow and shuffle dependencies, and partition-level tasks. Execution focuses on narrow transformations within a single process, without distributed execution.
 We begin by defining an RDDNode Go struct containing the core metadata discussed above. Operator describes the operation and stores the function ID for transformations, Dependencies describes the lineage through parent RDDs, and NumPartitions specifies how many logical partitions the RDD has.
-￼
+{{< figure src="images/RDDNode.png" alt="RDDNode Go struct" >}}
 We also include a Partitioner property. Unlike NumPartitions, it describes a stronger property: which destination partition should contain a particular key when a shuffle occurs. For a hash partitioner, the configuration is used as follows:
 partitionID := hash(key) % numPartitions
 This guarantees that the same key always maps to the same partition.
-￼
+{{< figure src="images/PartitionSpec.png" alt="PartitionSpec configuration" >}}
 RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. Recording operations and metadata without loading data or running the functions demonstrates Spark’s lazy evaluation.
 An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, working backward to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task.
 
@@ -57,7 +57,7 @@ Working on stage generation reminded me of an interesting case I encountered at 
 When reducing a larger partition count to 10 with coalesce(10), Spark groups existing partitions into 10 output partitions without a shuffle. This means the output stage has 10 tasks, with at most 10 running concurrently, depending on available executor slots. For a simple unpartitioned file write, this typically produces one data file per output partition, although file sizes may vary. In our case, reducing the partition count also limited the parallelism of the narrow pipeline and increased the runtime. It’s interesting to connect these real work experiences with the Spark execution architecture we’re building here.
 
 Once the stages are planned, we generate one task per partition of each stage.
-￼
+{{< figure src="images/GenerateTasks.png" alt="Task generation for stage partitions" >}}
 The code follows this general structure:
 for each stage {
     for partitionID := 0; partitionID < stage.NumPartitions; partitionID++ {
