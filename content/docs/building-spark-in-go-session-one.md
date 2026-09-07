@@ -13,7 +13,9 @@ Before starting the project, it helps to understand Spark’s core components an
 1. Dataset computation functions: allow Spark to stream and process the dataset’s elements.
 2. Partitions: describe how the dataset is divided.
 3. Lineage: records parent RDDs to describe how the data is derived.
+
 Note: Spark’s RDD abstraction also provides partition-computation behavior
+
 With these components in mind, we can walk through Spark’s core workflow. When a user submits a Spark job through spark-submit, the cluster manager—Kubernetes in this example—launches a driver pod. The driver creates a SparkContext as the entry point and coordinates the job’s execution. Let’s look at how a submitted job becomes executable tasks.
 
 {{< figure src="images/spark/decompositoinSketch.png" alt="Spark execution workflow decomposition sketch" >}}
