@@ -19,12 +19,12 @@ With these components in mind, we can walk through Spark’s core workflow. When
 {{< figure src="images/spark/decompositoinSketch.png" alt="Spark execution workflow decomposition sketch" >}}
 
 
-1.Source RDDs and transformations construct the lineage.
-2.DAGScheduler creates stages based on narrow and wide transformations.
-3.DAGScheduler creates tasks for runnable stages, with one task per partition.
-4.TaskScheduler assigns task attempts.
-5.Executors run partition pipelines.
-6.Results return to the driver.
+1. Source RDDs and transformations construct the lineage.
+2. DAGScheduler creates stages based on narrow and wide transformations.
+3. DAGScheduler creates tasks for runnable stages, with one task per partition.
+4. TaskScheduler assigns task attempts.
+5. Executors run partition pipelines.
+6. Results return to the driver.
 
 
 Session one focuses on building an MVP Spark execution engine while exploring RDD lineage, lazy evaluation, narrow and shuffle dependencies, and partition-level tasks. Execution focuses on narrow transformations within a single process, without distributed execution.
@@ -37,6 +37,7 @@ This guarantees that the same key always maps to the same partition.
 RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. Recording operations and metadata without loading data or running the functions demonstrates Spark’s lazy evaluation.
 An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, working backward to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task.
 
+```text
 RDD 0: TextFile(4 partitions)
   ↓ narrow
 RDD 1: MapToPair
@@ -46,11 +47,16 @@ RDD 2: ReduceByKey(2 partitions)
 RDD 3: MapValues
   ↓
 Collect()
+```
+
+```go
 // Start from the action target.
 ActionSpec{
     Kind:      ActionCollect,
     TargetRDD: 3,
 }
+```
+
 When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds a separate shuffle-map stage, establishing a stage boundary. (Shuffle execution is not implemented in session one)
 
 Working on stage generation reminded me of an interesting case I encountered at work. We had a relatively simple Spark job containing only narrow transformations that provided users with snapshots of dimension tables. The data volume was large, and we wanted to deliver the results as multiple reasonably sized files instead of one huge file, so we used coalesce to control the output partition count.
@@ -59,11 +65,15 @@ When reducing a larger partition count to 10 with coalesce(10), Spark groups exi
 Once the stages are planned, we generate one task per partition of each stage.
 {{< figure src="images/GenerateTasks.png" alt="Task generation for stage partitions" >}}
 The code follows this general structure:
+
+```text
 for each stage {
     for partitionID := 0; partitionID < stage.NumPartitions; partitionID++ {
         create task(stage, partitionID)
     }
 }
+```
+
 
 Finally, we create execution APIs that connect the plan to actual work. Session one does not include distributed execution: the DAG scheduler, stage planning, task generation, and execution all run in one Go process.
 We manage concurrency using goroutines to run tasks and two channels with different responsibilities. Go’s built-in support for concurrency is the primary reason we chose it for this project.
