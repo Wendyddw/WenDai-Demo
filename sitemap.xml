@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://wendai.dev/docs/building-spark-in-go-session-one/</loc>
+    <lastmod>2026-09-06T00:00:00-07:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/docs/my-introduction/</loc>
+    <lastmod>2025-11-04T21:05:51-08:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/categories/</loc>
+    <lastmod>2026-09-06T00:00:00-07:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/docs/</loc>
+    <lastmod>2026-09-06T00:00:00-07:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/categories/spark/</loc>
+    <lastmod>2026-09-06T00:00:00-07:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/</loc>
+    <lastmod>2026-09-06T00:00:00-07:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/categories/introduction/</loc>
+    <lastmod>2025-11-04T21:05:51-08:00</lastmod>
+  </url><url>
+    <loc>https://wendai.dev/tags/</loc>
+  </url>
+</urlset>
