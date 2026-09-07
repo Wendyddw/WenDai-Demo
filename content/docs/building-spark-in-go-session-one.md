@@ -28,9 +28,9 @@ With these components in mind, we can walk through Spark’s core workflow. When
 
 
 Session one focuses on building an MVP Spark execution engine while exploring RDD lineage, lazy evaluation, narrow and shuffle dependencies, and partition-level tasks. Execution focuses on narrow transformations within a single process, without distributed execution.
-We begin by defining an RDDNode Go struct containing the core metadata discussed above. Operator describes the operation and stores the function ID for transformations, Dependencies describes the lineage through parent RDDs, and NumPartitions specifies how many logical partitions the RDD has.
+I begin by defining an RDDNode Go struct containing the core metadata discussed above. Operator describes the operation and stores the function ID for transformations, Dependencies describes the lineage through parent RDDs, and NumPartitions specifies how many logical partitions the RDD has.
 {{< figure src="images/RDDNode.png" alt="RDDNode Go struct" >}}
-We also include a Partitioner property. Unlike NumPartitions, it describes a stronger property: which destination partition should contain a particular key when a shuffle occurs. For a hash partitioner, the configuration is used as follows:
+I also include a Partitioner property. Unlike NumPartitions, it describes a stronger property: which destination partition should contain a particular key when a shuffle occurs. For a hash partitioner, the configuration is used as follows:
 partitionID := hash(key) % numPartitions
 This guarantees that the same key always maps to the same partition.
 {{< figure src="images/PartitionSpec.png" alt="PartitionSpec configuration" >}}
@@ -60,9 +60,9 @@ ActionSpec{
 When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds a separate shuffle-map stage, establishing a stage boundary. (Shuffle execution is not implemented in session one)
 
 Working on stage generation reminded me of an interesting case I encountered at work. We had a relatively simple Spark job containing only narrow transformations that provided users with snapshots of dimension tables. The data volume was large, and we wanted to deliver the results as multiple reasonably sized files instead of one huge file, so we used coalesce to control the output partition count.
-When reducing a larger partition count to 10 with coalesce(10), Spark groups existing partitions into 10 output partitions without a shuffle. This means the output stage has 10 tasks, with at most 10 running concurrently, depending on available executor slots. For a simple unpartitioned file write, this typically produces one data file per output partition, although file sizes may vary. In our case, reducing the partition count also limited the parallelism of the narrow pipeline and increased the runtime. It’s interesting to connect these real work experiences with the Spark execution architecture we’re building here.
+When reducing a larger partition count to 10 with coalesce(10), Spark groups existing partitions into 10 output partitions without a shuffle. This means the output stage has 10 tasks, with at most 10 running concurrently, depending on available executor slots. For a simple unpartitioned file write, this typically produces one data file per output partition, although file sizes may vary. In our case, reducing the partition count also limited the parallelism of the narrow pipeline and increased the runtime. It’s interesting to connect these real work experiences with the Spark execution architecture I’m building here.
 
-Once the stages are planned, we generate one task per partition of each stage.
+Once the stages are planned, I generate one task per partition of each stage.
 {{< figure src="images/GenerateTasks.png" alt="Task generation for stage partitions" >}}
 The code follows this general structure:
 
@@ -75,8 +75,8 @@ for each stage {
 ```
 
 
-Finally, we create execution APIs that connect the plan to actual work. Session one does not include distributed execution: the DAG scheduler, stage planning, task generation, and execution all run in one Go process.
-We manage concurrency using goroutines to run tasks and two channels with different responsibilities. Go’s built-in support for concurrency is the primary reason we chose it for this project.
+Finally, I create execution APIs that connect the plan to actual work. Session one does not include distributed execution: the DAG scheduler, stage planning, task generation, and execution all run in one Go process.
+I manage concurrency using goroutines to run tasks and two channels with different responsibilities. Go’s built-in support for concurrency is the primary reason I chose it for this project.
 The scheduler launches one goroutine per task, as shown in scheduler/dag_scheduler.go.
 Before executing runTask, each goroutine must acquire a slot by sending into the runner’s buffered permits channel. The channel’s capacity sets the concurrency limit. When it is full, additional goroutines wait. A deferred receive releases the slot when execution finishes, while context cancellation allows waiting tasks to exit. This logic lives in executor/local_runner.go.
 Task goroutines report success or failure through a separate event channel. A single scheduler event-loop goroutine processes these events and updates job state, as shown in scheduler/event_loop.go. Tasks execute concurrently, while completion counts, results, and job state are updated one event at a time.
