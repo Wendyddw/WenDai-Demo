@@ -1,7 +1,7 @@
 ---
 date: 2026-09-06T00:00:00-07:00
 draft: false
-title: 'Building Spark Core Execution Architecture in Go: Session One'
+title: 'Building a Spark-Style Execution Engine in Go: From RDD Lineage to Local Task Execution'
 description: 'Exploring Spark execution architecture through RDD lineage, stage planning, and concurrent task execution in Go.'
 categories:
   - 'Spark'
@@ -35,6 +35,7 @@ partitionID := hash(key) % numPartitions
 This guarantees that the same key always maps to the same partition.
 {{< figure src="images/spark/PartitionSpec.png" alt="PartitionSpec configuration" >}}
 RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. Recording operations and metadata without loading data or running the functions demonstrates Spark’s lazy evaluation.
+
 An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, **working backward** to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task.
 
 ```text
@@ -64,7 +65,8 @@ When reducing a larger partition count to 10 with coalesce(10), Spark groups exi
 
 Once the stages are planned, I generate one task per partition of each stage.
 {{< figure src="images/spark/GenerateTasks.png" alt="Task generation for stage partitions" >}}
-The code follows this general structure:
+
+The above code generally does following:
 
 ```text
 for each stage {
@@ -74,9 +76,10 @@ for each stage {
 }
 ```
 
-
 Finally, I create execution APIs that connect the plan to actual work. Session one does not include distributed execution: the DAG scheduler, stage planning, task generation, and execution all run in one Go process.
 I manage concurrency using goroutines to run tasks and two channels with different responsibilities. Go’s built-in support for concurrency is the primary reason I chose it for this project.
 The scheduler launches one goroutine per task, as shown in [scheduler/dag_scheduler.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/dag_scheduler.go).
 Before executing runTask, each goroutine must acquire a slot by sending into the runner’s buffered permits channel. The channel’s capacity sets the concurrency limit. When it is full, additional goroutines wait. A deferred receive releases the slot when execution finishes, while context cancellation allows waiting tasks to exit. This logic lives in [executor/local_runner.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/local_runner.go).
 Task goroutines report success or failure through a separate event channel. A single scheduler event-loop goroutine processes these events and updates job state, as shown in [scheduler/event_loop.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/event_loop.go). Tasks execute concurrently, while completion counts, results, and job state are updated one event at a time.
+
+This wraps up session one, from building RDD lineage and recording lazy transformations to planning stages and running partition-level tasks in a single Go process. It’s been interesting to connect Spark concepts I encounter at work with the implementation behind them. Next, I’ll build on this foundation to explore distributed execution.
