@@ -16,7 +16,7 @@ Before starting the project, it helps to understand Spark’s core components an
 Note: Spark’s RDD abstraction also provides partition-computation behavior
 With these components in mind, we can walk through Spark’s core workflow. When a user submits a Spark job through spark-submit, the cluster manager—Kubernetes in this example—launches a driver pod. The driver creates a SparkContext as the entry point and coordinates the job’s execution. Let’s look at how a submitted job becomes executable tasks.
 
-[Workflow diagram here]
+{{< figure src="images/spark/decompositoinSketch.png" alt="Spark execution workflow decomposition sketch" >}}
 
 
 1.Source RDDs and transformations construct the lineage.
