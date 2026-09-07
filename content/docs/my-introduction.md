@@ -10,12 +10,12 @@ weight: 999
 
 ## Introduction
 
-Hi, I'm Wen — a software engineer with three years of experience building data platforms and large-scale data systems in production. I specialize in Spark, data lakes, data streaming, validation, and visualization.
+Hi, I'm Wen — a software engineer focused on data engineering and large-scale data systems.
 
-I've worked across the full data pipeline, from ingesting real-time factory streaming data and batch processing to storing it in data warehouses, building Spark batch jobs, and surfacing aggregated data for Tesla's cell manufacturing yield and financial reporting.
+I work on Spark, data lakes, real-time streaming, metadata and lineage, data quality and governance, and large-scale data serving. I'm especially interested in distributed systems, Spark internals, and the infrastructure behind modern data and AI platforms.
 
-This blog is where I share insights about Spark, large-scale data systems, and other programming projects I find interesting.
+This blog is where I share what I learn from building these systems, along with programming projects I find interesting.
 
 ## More about Me
 
-When I'm not debugging data pipelines, you'll find me exploring new destinations 🗺️, hitting the slopes ⛷️, or pushing my limits in CrossFit training 💪. I thrive on challenges — whether it's optimizing a Spark job, or tackling a new route on the mountain. There's something satisfying about the process of breaking down complex problems and finding solutions, whether it's in code or in life.
+When I'm not debugging data platform issues, you'll find me exploring new destinations 🗺️, hitting the slopes ⛷️, or pushing my limits in CrossFit training 💪. I thrive on challenges — whether it's optimizing a Spark job, or tackling a new route on the mountain. There's something satisfying about the process of breaking down complex problems and finding solutions, whether it's in code or in life.
