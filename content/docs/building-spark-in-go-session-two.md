@@ -10,7 +10,7 @@ weight: 2
 
 In [session one]({{< ref "building-spark-in-go-session-one.md" >}}), we successfully implemented RDD lineage building, stage planning, and partition-level tasks in a single Go process. Goroutines provide concurrency, and channels coordinate that concurrency at the task execution level. But all goroutines share the same memory, function registry, filesystem access, and process lifecycle. All components share a process, so an unrecovered panic in one goroutine can bring down the entire application.
 
-In this session, we replace the single process with distributed execution to establish process and network boundaries. We introduce a physical scheduler and multiple independent worker processes that communicate with the coordinator over HTTP, mimicing deploying microservices on AWS.
+In this session, we replace the single process with distributed execution to establish process and network boundaries. We introduce **a physical scheduler and multiple independent worker processes** that communicate with the coordinator over HTTP, mimicing deploying microservices on AWS.
 
 {{< figure src="images/spark/distributed_executions.png" alt="Moving from a single Go process to a driver and independent worker processes communicating over HTTP" >}}
 
@@ -19,7 +19,7 @@ The key components of this session are:
 1. A scheduler that handles worker registration, heartbeats, task assignments, and result collection.
 2. A corresponding worker workflow for communicating available resources, processing tasks, and reporting results.
 
-Let’s start with the scheduler and scheduling policies. Here, we mimic [Spark’s FIFO scheduling policies](https://spark.apache.org/docs/latest/job-scheduling.html) with similar capacity-matching rules, but simplify some internal mechanisms and use a queue-based scheduling model. We set the following three rules:
+Let’s start with the scheduler and scheduling policies. Here, we mimic [Spark’s FIFO scheduling policies](https://spark.apache.org/docs/latest/job-scheduling.html) with similar capacity-matching rules, but simplify some internal mechanisms and **use a queue-based scheduling model**. We set the following three rules:
 
 1\. Select the oldest task set with pending tasks.
 
@@ -92,7 +92,7 @@ After the report is acknowledged, the worker releases local capacity and repeats
 Now that we’ve reviewed the core workflows of the scheduler and worker, the remaining question is: how do these two components communicate with each other?
 Here, we introduce the coordinator interface, which handles network communication between the scheduler and worker processes. For this project, our immediate messages are registration, heartbeats, assignments, and results. They fit the request/response model well.
 
-We choose to use a RESTful API with HTTP and JSON for rapid prototyping, allowing us to concentrate on the more complicated scheduling behavior: reservations, stale attempts, cancellation, and worker failure. For production, we would use gRPC with Protocol Buffers as the payload for more efficient and type-safe internal service-to-service communication.
+We choose to use **a RESTful API with HTTP and JSON for rapid prototyping**, allowing us to concentrate on the more complicated scheduling behavior: reservations, stale attempts, cancellation, and worker failure. For production, we would use gRPC with Protocol Buffers as the payload for more efficient and type-safe internal service-to-service communication.
 
 One more thing to mention is that the coordinator shares the same Go process as the scheduler, but deliberately handles HTTP endpoints, JSON decoding, request validation, and error responses to avoid mixing network handling with scheduler placement logic.
 
