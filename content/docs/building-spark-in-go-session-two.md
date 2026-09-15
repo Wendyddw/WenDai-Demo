@@ -24,7 +24,7 @@ Let’s start with the scheduler and scheduling policies. Here, we mimic [Spark�
 1\. Select the oldest task set with pending tasks.
 
 Spark schedules by active stages and priority pools rather than strictly picking the “oldest” task set globally.
-The scheduler first appends each accepted task set to `s.queue` (`scheduler/fifo_task_scheduler.go`, line 136), then scans that queue in insertion order (line 239).
+The scheduler first appends each accepted task set to `s.queue` ([scheduler/fifo_task_scheduler.go, line 136](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go#L136)), then scans that queue in insertion order ([line 239](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go#L239)).
 
 ```go
 // Append task sets in admission order.
@@ -45,7 +45,7 @@ for _, set := range s.queue {
 
 2\. Select its lowest pending partition.
 
-The scheduler prepares task sets and sorts their tasks by ascending `PartitionID` (`scheduler/fifo_task_scheduler.go`, line 188). It then selects `set.tasks[set.pending]` and advances the cursor (line 247).
+The scheduler prepares task sets and sorts their tasks by ascending `PartitionID` ([scheduler/fifo_task_scheduler.go, line 188](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go#L188)). It then selects `set.tasks[set.pending]` and advances the cursor ([line 247](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go#L247)).
 
 ```go
 // Sort once when preparing the task set.
@@ -60,7 +60,7 @@ set.pending++
 
 3\. Assign work up to the offering worker’s available capacity.
 
-The scheduler starts with the worker’s reported free slots. Some slots may already be reserved for tasks whose assignments are still on the way, so the worker hasn’t included them in its heartbeat yet. It subtracts those reservations to avoid assigning more work than the worker can handle and checks that the result stays within the worker’s total unreserved capacity. Then it assigns tasks while slots remain, reserving one slot and reducing `available` for each assignment (`scheduler/fifo_task_scheduler.go`, line 232).
+The scheduler starts with the worker’s reported free slots. Some slots may already be reserved for tasks whose assignments are still on the way, so the worker hasn’t included them in its heartbeat yet. It subtracts those reservations to avoid assigning more work than the worker can handle and checks that the result stays within the worker’s total unreserved capacity. Then it assigns tasks while slots remain, reserving one slot and reducing `available` for each assignment (`scheduler/fifo_task_scheduler.go`, [line 232](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go#L232)).
 
 ```go
 available := free
