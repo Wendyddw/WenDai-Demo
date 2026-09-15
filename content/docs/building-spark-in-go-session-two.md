@@ -10,7 +10,7 @@ weight: 2
 
 In [session one]({{< ref "building-spark-in-go-session-one.md" >}}), we successfully implemented RDD lineage building, stage planning, and partition-level tasks in a single Go process. Goroutines provide concurrency, and channels coordinate that concurrency at the task execution level. But all goroutines share the same memory, function registry, filesystem access, and process lifecycle. All components share a process, so an unrecovered panic in one goroutine can bring down the entire application.
 
-In this session, we replace the single process with distributed execution to establish process and network boundaries. We introduce a physical scheduler and multiple independent worker processes that communicate with the coordinator over HTTP, like deploying microservices on AWS.
+In this session, we replace the single process with distributed execution to establish process and network boundaries. We introduce a physical scheduler and multiple independent worker processes that communicate with the coordinator over HTTP, mimicing deploying microservices on AWS.
 
 {{< figure src="images/spark/distributed_executions.png" alt="Moving from a single Go process to a driver and independent worker processes communicating over HTTP" >}}
 
