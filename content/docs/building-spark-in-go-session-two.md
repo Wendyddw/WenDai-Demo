@@ -1,7 +1,7 @@
 ---
 date: 2026-09-14T22:48:56-07:00
 draft: false
-title: 'Building a Spark-Style Execution Engine in Go: Distributed Task Execution'
+title: 'Sparkcore-Go: Distributed Task Execution'
 description: 'Extending the Go execution engine with FIFO scheduling, independent worker processes, and HTTP communication for distributed task execution.'
 categories:
   - 'Spark'

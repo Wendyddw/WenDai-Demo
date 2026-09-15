@@ -1,7 +1,7 @@
 ---
 date: 2026-09-06T00:00:00-07:00
 draft: false
-title: 'Building a Spark-Style Execution Engine in Go: From RDD Lineage to Local Task Execution'
+title: 'Sparkcore-Go: From RDD Lineage to Local Task Execution'
 description: 'Exploring Spark execution architecture through RDD lineage, stage planning, and concurrent task execution in Go.'
 categories:
   - 'Spark'
