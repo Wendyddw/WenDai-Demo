@@ -1,0 +1,19 @@
+/* Keep article links distinct in both color themes. */
+.post-content {
+    --article-link-color: #0969da;
+}
+
+[data-theme="dark"] .post-content {
+    --article-link-color: #79b8ff;
+}
+
+.post-content a {
+    color: var(--article-link-color);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    box-shadow: none;
+}
+
+.post-content a:hover {
+    text-decoration-thickness: 2px;
+}

@@ -8,7 +8,7 @@ categories:
 weight: 2
 ---
 
-Source code: [sparkcore-go on GitHub](https://github.com/Wendyddw/sparkcore-go)
+Github Link: [Sparkcore-Go](https://github.com/Wendyddw/sparkcore-go)
 
 In [session one]({{< ref "building-spark-in-go-session-one.md" >}}), I successfully implemented RDD lineage building, stage planning, and partition-level tasks in a single Go process. Goroutines provide concurrency, and channels coordinate that concurrency at the task execution level. But all goroutines share the same memory, function registry, filesystem access, and process lifecycle. An unrecovered panic in one goroutine can bring down the entire application.
 
