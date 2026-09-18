@@ -8,6 +8,8 @@ categories:
 weight: 1
 ---
 
+Source code: [sparkcore-go on GitHub](https://github.com/Wendyddw/sparkcore-go)
+
 I’m building Spark’s core execution architecture in Go to explore the systems behind distributed computation and learn through implementation. The work will be divided into three sessions, each with a different focus.
 
 Let’s look at how a submitted job becomes executable tasks.
