@@ -34,7 +34,7 @@ I also include a Partitioner property. Unlike NumPartitions, it describes a stro
 partitionID := hash(key) % numPartitions
 This guarantees that the same key always maps to the same partition.
 {{< figure src="images/spark/PartitionSpec.png" alt="PartitionSpec configuration" >}}
-RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. Recording operations and metadata without loading data or running the functions demonstrates Spark’s lazy evaluation.
+RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. **Recording operations and metadata without loading data or running the functions** demonstrates Spark’s lazy evaluation.
 
 An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, **working backward** to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task.
 
@@ -58,12 +58,12 @@ ActionSpec{
 }
 ```
 
-When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds a separate shuffle-map stage, establishing a stage boundary. (Shuffle execution is not implemented in session one)
+When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds **a separate shuffle-map stage, establishing a stage boundary**. (Shuffle execution is not implemented in session one)
 
 Working on stage generation reminded me of an interesting case I encountered at work. We had a relatively simple Spark job containing only narrow transformations that provided users with snapshots of dimension tables. The data volume was large, and we wanted to deliver the results as multiple reasonably sized files instead of one huge file, so we used coalesce to control the output partition count.
 When reducing a larger partition count to 10 with coalesce(10), Spark groups existing partitions into 10 output partitions without a shuffle. This means the output stage has 10 tasks, with at most 10 running concurrently, depending on available executor slots. For a simple unpartitioned file write, this typically produces one data file per output partition, although file sizes may vary. In our case, reducing the partition count also limited the parallelism of the narrow pipeline and increased the runtime. It’s interesting to connect these real work experiences with the Spark execution architecture I’m building here.
 
-Once the stages are planned, I generate one task per partition of each stage.
+Once the stages are planned, I generate **one task per partition of each stage**.
 {{< figure src="images/spark/GenerateTasks.png" alt="Task generation for stage partitions" >}}
 
 The above code generally does following:
@@ -77,9 +77,9 @@ for each stage {
 ```
 
 Finally, I create execution APIs that connect the plan to actual work. Session one does not include distributed execution: the DAG scheduler, stage planning, task generation, and execution all run in one Go process.
-I manage concurrency using goroutines to run tasks and two channels with different responsibilities. Go’s built-in support for concurrency is the primary reason I chose it for this project.
+I manage concurrency using goroutines to run tasks and two channels with different responsibilities. **Go’s built-in support for concurrency** is the primary reason I chose it for this project.
 The scheduler launches one goroutine per task, as shown in [scheduler/dag_scheduler.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/dag_scheduler.go).
-Before executing runTask, each goroutine must acquire a slot by sending into the runner’s buffered permits channel. The channel’s capacity sets the concurrency limit. When it is full, additional goroutines wait. A deferred receive releases the slot when execution finishes, while context cancellation allows waiting tasks to exit. This logic lives in [executor/local_runner.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/local_runner.go).
-Task goroutines report success or failure through a separate event channel. A single scheduler event-loop goroutine processes these events and updates job state, as shown in [scheduler/event_loop.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/event_loop.go). Tasks execute concurrently, while completion counts, results, and job state are updated one event at a time.
+Before executing runTask, each goroutine must acquire a slot by sending into the runner’s buffered permits channel. **The channel’s capacity sets the concurrency limit.** When it is full, additional goroutines wait. A deferred receive releases the slot when execution finishes, while context cancellation allows waiting tasks to exit. This logic lives in [executor/local_runner.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/local_runner.go).
+Task goroutines report success or failure through a separate event channel. **A single scheduler event-loop goroutine processes these events and updates job state**, as shown in [scheduler/event_loop.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/event_loop.go). Tasks execute concurrently, while completion counts, results, and job state are updated one event at a time.
 
 This wraps up session one, from building RDD lineage and recording lazy transformations to planning stages and running partition-level tasks in a single Go process. It’s been interesting to connect Spark concepts I encounter at work with the implementation behind them. Next, I’ll build on this foundation to explore distributed execution.
