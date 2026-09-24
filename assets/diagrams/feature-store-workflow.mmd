@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph DE["Traditional data engineering — typical workflow"]
+        direction TB
+        A["Raw data: events, logs, transactions"] --> B["Ingestion and historical storage"]
+        B --> C["Batch / streaming transformations"]
+        C --> D["Curated lakehouse / warehouse tables"]
+        D --> E["Analytics, dashboards, reporting"]
+    end
+
+    subgraph FE["Feature engineering with a feature store"]
+        direction TB
+        F["Raw data: events, logs, transactions"] --> G["Ingestion and historical storage"]
+        G --> H["Feature transformations<br/>Event-time windows and aggregations"]
+        H --> I["Offline store<br/>Historical feature snapshots"]
+        I --> J["Point-in-time join with labels"]
+        J --> K["Training data and backtesting"]
+        I --> L["Sync latest features"]
+        L --> M["Online store<br/>Low-latency feature lookup"]
+        M --> N["Online inference"]
+    end
