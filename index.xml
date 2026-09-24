@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Wen Dai | Dev Playground</title>
+    <link>https://wendai.dev/</link>
+    <description>Recent content on Wen Dai | Dev Playground</description>
+    <generator>Hugo -- 0.152.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 23 Sep 2026 22:36:38 -0700</lastBuildDate>
+    <atom:link href="https://wendai.dev/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mini Feature Store: Structuring the Offline Store</title>
+      <link>https://wendai.dev/docs/mini-feature-store-offline/</link>
+      <pubDate>Wed, 23 Sep 2026 22:36:38 -0700</pubDate>
+      <guid>https://wendai.dev/docs/mini-feature-store-offline/</guid>
+      <description>A data engineering perspective on feature stores and offline batch jobs with Scala and Spark.</description>
+    </item>
+    <item>
+      <title>Sparkcore-Go: From RDD Lineage to Local Task Execution</title>
+      <link>https://wendai.dev/docs/building-spark-in-go-session-one/</link>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 -0700</pubDate>
+      <guid>https://wendai.dev/docs/building-spark-in-go-session-one/</guid>
+      <description>Exploring Spark execution architecture through RDD lineage, stage planning, and concurrent task execution in Go.</description>
+    </item>
+    <item>
+      <title>Sparkcore-Go: Distributed Task Execution</title>
+      <link>https://wendai.dev/docs/building-spark-in-go-session-two/</link>
+      <pubDate>Mon, 14 Sep 2026 22:48:56 -0700</pubDate>
+      <guid>https://wendai.dev/docs/building-spark-in-go-session-two/</guid>
+      <description>Extending the Go execution engine with FIFO scheduling, independent worker processes, and HTTP communication for distributed task execution.</description>
+    </item>
+    <item>
+      <title>About Me</title>
+      <link>https://wendai.dev/docs/my-introduction/</link>
+      <pubDate>Thu, 17 Sep 2026 21:31:59 -0700</pubDate>
+      <guid>https://wendai.dev/docs/my-introduction/</guid>
+      <description>A little about my work and interests outside of engineering.</description>
+    </item>
+  </channel>
+</rss>

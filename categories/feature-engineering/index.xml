@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Feature Engineering on Wen Dai | Dev Playground</title>
+    <link>https://wendai.dev/categories/feature-engineering/</link>
+    <description>Recent content in Feature Engineering on Wen Dai | Dev Playground</description>
+    <generator>Hugo -- 0.152.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 23 Sep 2026 22:36:38 -0700</lastBuildDate>
+    <atom:link href="https://wendai.dev/categories/feature-engineering/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mini Feature Store: Structuring the Offline Store</title>
+      <link>https://wendai.dev/docs/mini-feature-store-offline/</link>
+      <pubDate>Wed, 23 Sep 2026 22:36:38 -0700</pubDate>
+      <guid>https://wendai.dev/docs/mini-feature-store-offline/</guid>
+      <description>A data engineering perspective on feature stores and offline batch jobs with Scala and Spark.</description>
+    </item>
+  </channel>
+</rss>
