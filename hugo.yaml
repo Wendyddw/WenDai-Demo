@@ -6,6 +6,11 @@ theme: PaperMod
 enableEmoji: true
 params:
   author: Wen Dai
+  assets:
+    favicon: "/favicon.png"
+    favicon16x16: "/favicon-16x16.png"
+    favicon32x32: "/favicon-32x32.png"
+    apple_touch_icon: "/apple-touch-icon.png"
   homeInfoParams:
     Title: "The dev playground"
     Content: >
