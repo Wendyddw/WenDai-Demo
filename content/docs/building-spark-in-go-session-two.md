@@ -5,7 +5,7 @@ title: 'Sparkcore-Go: Distributed Task Execution'
 description: 'Extending the Go execution engine with FIFO scheduling, independent worker processes, and HTTP communication for distributed task execution.'
 categories:
   - 'Spark'
-weight: 2
+weight: 3
 ---
 
 Github Link: [Sparkcore-Go](https://github.com/Wendyddw/sparkcore-go)

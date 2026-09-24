@@ -5,7 +5,7 @@ title: 'Mini Feature Store: Structuring the Offline Store'
 description: 'A data engineering perspective on feature stores and offline batch jobs with Scala and Spark.'
 categories:
   - 'Spark'
-weight: 3
+weight: 1
 ---
 
 Github Link: [Mini Feature Store](https://github.com/Wendyddw/mini-feature-store)

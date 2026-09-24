@@ -5,7 +5,7 @@ title: 'Sparkcore-Go: From RDD Lineage to Local Task Execution'
 description: 'Exploring Spark execution architecture through RDD lineage, stage planning, and concurrent task execution in Go.'
 categories:
   - 'Spark'
-weight: 1
+weight: 2
 ---
 
 Github Link: [Sparkcore-Go](https://github.com/Wendyddw/sparkcore-go)
