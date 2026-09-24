@@ -9,7 +9,7 @@ params:
   homeInfoParams:
     Title: "The dev playground"
     Content: >
-      Welcome to the **dev playground** 🦄
+      Hi, I’m Wen. Welcome to my **dev playground**.
 
       - A space where I share what I’m learning and building with Spark, data engineering, and distributed systems.
 
