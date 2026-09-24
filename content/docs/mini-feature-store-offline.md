@@ -4,7 +4,7 @@ draft: false
 title: 'Mini Feature Store: Structuring the Offline Store'
 description: 'A data engineering perspective on feature stores and offline batch jobs with Scala and Spark.'
 categories:
-  - 'Spark'
+  - 'Feature Engineering'
 weight: 1
 ---
 
