@@ -1,0 +1,20 @@
+flowchart LR
+    single["<div style='text-align:left;line-height:1.65'><b>One Go process</b><br/><br/>DAG scheduler goroutine<br/>Scheduler event channel<br/>Task goroutine: partition 0<br/>Task goroutine: partition 1<br/>Local Runner</div>"]
+
+    subgraph distributed[" "]
+        driver["<div style='text-align:left;line-height:1.65'><b>Driver Process</b><br/><br/>DAG Scheduler<br/>Coordinator<br/>Job / stage state<br/>Retry decisions</div>"]
+        subgraph workers["Worker Processes"]
+            workerA["<div style='text-align:left;line-height:1.65'><b>Worker A</b><br/><br/>Task attempt P0<br/>Task attempt P1<br/>Results / heartbeats</div>"]
+            workerB["<div style='text-align:left;line-height:1.65'><b>Worker B</b><br/><br/>Task attempt P2<br/>Result / failure</div>"]
+        end
+        driver <-->|HTTP| workerA
+        driver <-->|HTTP| workerB
+    end
+
+    single ==> driver
+
+    style single fill:#eef5ff,stroke:#3684d6,stroke-width:3px,color:#222
+    style distributed fill:#eff8ee,stroke:#61a45b,color:#222
+    style workers fill:transparent,stroke:transparent,color:#222
+    classDef process fill:#fff7d6,stroke:#bd9a30,color:#222
+    class driver,workerA,workerB process

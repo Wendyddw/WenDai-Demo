@@ -1,0 +1,15 @@
+{
+  "theme": "neutral",
+  "flowchart": {
+    "htmlLabels": true,
+    "wrappingWidth": 340,
+    "nodeSpacing": 36,
+    "rankSpacing": 55,
+    "padding": 20
+  },
+  "themeVariables": {
+    "fontFamily": "Arial, sans-serif",
+    "fontSize": "18px"
+  },
+  "themeCSS": ".cluster-label { font-weight: 600; }"
+}

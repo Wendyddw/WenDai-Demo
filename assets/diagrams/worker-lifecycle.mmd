@@ -1,0 +1,12 @@
+flowchart LR
+    register["Register"] --> heartbeat["Heartbeat"]
+    heartbeat --> assignments["Receive assignments"]
+    assignments --> execute["Execute"]
+    execute --> report["Report"]
+    report --> slots["Free slots"]
+    slots -->|Repeat| heartbeat
+
+    classDef startup fill:#eef5ff,stroke:#3684d6,stroke-width:2px,color:#222
+    classDef recurring fill:#fff7d6,stroke:#bd9a30,color:#222
+    class register startup
+    class heartbeat,assignments,execute,report,slots recurring

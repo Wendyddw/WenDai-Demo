@@ -16,7 +16,7 @@ In this session, I replace the single process with distributed execution to esta
 
 The coordinator shares the same Go process as the scheduler, but deliberately handles HTTP endpoints, JSON decoding, request validation, and error responses to avoid mixing network handling with scheduler placement logic.
 
-{{< figure src="images/spark/distributed_executions.png" alt="Moving from a single Go process to a driver and independent worker processes communicating over HTTP" >}}
+{{< figure src="images/spark/distributed-execution.svg" link="/images/spark/distributed-execution.svg" alt="Moving from a single Go process to a driver and independent worker processes communicating over HTTP" >}}
 
 ### Scheduling Tasks
 
@@ -88,7 +88,7 @@ for available > 0 && set.pending < len(set.tasks) {
 
 The worker, meanwhile, has its own essential workflow, from reporting its status to claiming tasks from the scheduler. Let’s take a high-level look at the worker’s lifecycle (`worker/runtime.go`, line 92).
 
-{{< figure src="images/spark/worker.png" alt="Worker lifecycle: register, send heartbeats, receive assignments, execute, report results, and free slots" >}}
+{{< figure src="images/spark/worker-lifecycle.svg" link="/images/spark/worker-lifecycle.svg" alt="Worker lifecycle: register, send heartbeats, receive assignments, execute, report results, and free slots" >}}
 
 On startup, the worker sends its ID and total slot capacity to the coordinator as a one-time initial registration. It then sends a heartbeat immediately and periodically afterward, containing free slots and active attempt IDs to report its status and request work.
 
