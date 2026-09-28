@@ -24,7 +24,7 @@ RDDs are Spark’s fundamental abstraction. We can think of an RDD as a metadata
 
 1. Dataset computation functions: allow Spark to stream and process the dataset’s elements.
 2. Partitions: describe how the dataset is divided.
-3. Lineage: records parent RDDs to describe how the data is derived.
+3. Lineage: records parent RDDs to describe how the data is derived. [[1]](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf)
 
 I begin by defining an RDDNode Go struct containing the core metadata discussed above. Operator describes the operation and stores the function ID for transformations, Dependencies describes the lineage through parent RDDs, and NumPartitions specifies how many logical partitions the RDD has.
 
@@ -36,15 +36,15 @@ I also include a Partitioner property. Unlike NumPartitions, it describes a stro
 partitionID := hash(key) % numPartitions
 ```
 
-This guarantees that the same key always maps to the same partition.
+This guarantees that the same key always maps to the same partition. [[1]](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf)
 
 {{< figure src="images/spark/PartitionSpec.png" alt="PartitionSpec configuration" >}}
 
-RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. **Recording operations and metadata without loading data or running the functions** demonstrates Spark’s lazy evaluation.
+RDD nodes and their metadata are stored in RDDGraph, a driver-owned map. The graph deep-copies these nodes to prevent callers from accidentally changing the recorded lineage. Actual records are not loaded into the driver before execution. **Recording operations and metadata without loading data or running the functions** demonstrates Spark’s lazy evaluation. [[1]](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf) [[2]](https://people.csail.mit.edu/matei/papers/2015/sigmod_spark_sql.pdf)
 
 ### Planning Stages and Tasks
 
-An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, **working backward** to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task.
+An action such as Count or Collect triggers planning and execution. The planner starts from the action’s target and follows parent references in RDDGraph, **working backward** to discover the computation needed to produce the target. For RDDs with narrow dependencies, an output partition can be computed directly from its parent partition, allowing the operations to run within one task. [[1]](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf)
 
 ```text
 RDD 0: TextFile(4 partitions)
@@ -66,7 +66,7 @@ ActionSpec{
 }
 ```
 
-When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds **a separate shuffle-map stage, establishing a stage boundary**. (Shuffle execution is not implemented in session one)
+When the planner encounters a shuffle dependency, computing one reduce partition requires records from multiple upstream partitions. It builds **a separate shuffle-map stage, establishing a stage boundary**. [[1]](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf) (Shuffle execution is not implemented in session one)
 
 Working on stage generation reminded me of an interesting case I encountered at work. We had a Spark job containing only narrow transformations that provided users with snapshots of dimension tables. We used coalesce to control the output partition count and deliver the results as multiple reasonably sized files.
 
@@ -101,3 +101,9 @@ Before executing runTask, each goroutine must acquire a slot by sending into the
 Task goroutines report success or failure through a separate event channel. **A single scheduler event-loop goroutine processes these events and updates job state**, as shown in [scheduler/event_loop.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/event_loop.go). Tasks execute concurrently, while completion counts, results, and job state are updated one event at a time.
 
 This wraps up session one, from building RDD lineage and recording lazy transformations to planning stages and running partition-level tasks in a single Go process. It’s been interesting to connect Spark concepts I encounter at work with the implementation behind them. Next, I’ll build on this foundation to explore distributed execution.
+
+### References
+
+1. M. Zaharia et al. [Resilient Distributed Datasets: A Fault-Tolerant Abstraction for In-Memory Cluster Computing](https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final138.pdf). NSDI, 2012.
+2. M. Armbrust et al. [Spark SQL: Relational Data Processing in Spark](https://people.csail.mit.edu/matei/papers/2015/sigmod_spark_sql.pdf). SIGMOD, 2015.
+3. J. Laskowski. [QueryExecution](https://books.japila.pl/spark-sql-internals/QueryExecution/). *The Internals of Spark SQL*. Online technical guide.
