@@ -1,0 +1,6 @@
+flowchart LR
+    E["Raw events<br/>Parquet"] --> B["BackfillPipeline"]
+    B --> F["Daily feature history<br/>Iceberg"]
+    F --> P["PointInTimeJoinPipeline"]
+    L["Labels + prediction timestamps<br/>Parquet"] --> P
+    P --> T["Training data<br/>Parquet"]

@@ -100,8 +100,50 @@ The traits under platform define **shared contracts for infrastructure used in b
 
 Existing component tests run complete pipelines on local Spark with in-memory `TestFetcher` and `TestWriter`. A next step is to add focused unit tests for extracted transformations and edge cases.
 
-This wraps up the Spark job setup. In this repo, `BackfillPipeline` aggregates raw events into daily user features, including rolling event counts and days since the last event within the lookback window, then writes them to Iceberg partitioned by day. `PointInTimeJoinPipeline` joins labels with the latest feature snapshot on or before each label’s date and writes training data to Parquet.
+### Building Historical Features and Training Data
 
-Time comparisons use calendar dates, so future-day snapshots are excluded, but same-day leakage remains possible.
+With the Spark Scala batch job structure in place, let’s dive into `BackfillPipeline` and `PointInTimeJoinPipeline`. These batch jobs build historical feature snapshots, then use that history to produce training examples with features matched to the prediction date. This provides date-level filtering, though full point-in-time correctness needs more precise time handling. Below is a workflow showing how we transform raw event data into training data.
 
-That’s it for the offline setup for now. In the next part, I’ll walk through the online store and how we serve these features for real-time predictions. To be continued!
+{{< figure src="images/feature-store/training-workflow.svg" link="/images/feature-store/training-workflow.svg" alt="Raw Parquet events pass through BackfillPipeline into daily Iceberg feature history, then PointInTimeJoinPipeline joins labels and prediction timestamps to produce Parquet training data" >}}
+
+Let’s walk through the jobs with sample data for a more straightforward view. We start with the following raw user events:
+
+| user_id | event_type | ts |
+| --- | --- | --- |
+| user1 | click | Jan 1, 10:00 |
+| user1 | purchase | Jan 3, 14:00 |
+| user1 | click | Jan 5, 09:00 |
+
+`BackfillPipeline` aggregates raw events into daily user features, including rolling event counts and days since the last event within the lookback window, then writes them to Iceberg partitioned by day. Each row describes the user’s activity through that calendar day.
+
+| user_id | day | event_count_7d | event_count_30d | last_event_days_ago | event_type_counts |
+| --- | --- | --- | --- | --- | --- |
+| user1 | Jan 1 | 1 | 1 | 0 | "1" |
+| user1 | Jan 2 | 1 | 1 | 1 | "1" |
+| user1 | Jan 3 | 2 | 2 | 0 | "2" |
+| user1 | Jan 4 | 2 | 2 | 1 | "2" |
+| user1 | Jan 5 | 3 | 3 | 0 | "2" |
+
+In this implementation, `event_type_counts` is the number of distinct event types, stored as a string.
+
+`PointInTimeJoinPipeline` joins labels with the latest feature snapshot on or before each label’s date. Labels represent the target outcomes for the examples we want to train on. For illustration, the prediction task could be “Will this user purchase within the next 24 hours?” A label of `1.0` means yes, and `0.0` means no.
+
+| user_id | as_of_ts | label |
+| --- | --- | --- |
+| user1 | Jan 2, 18:00 | 1.0 |
+| user1 | Jan 4, 18:00 | 0.0 |
+
+To produce the training data, `PointInTimeJoinPipeline` selects the latest snapshot on or before each label’s date and writes the joined rows to Parquet. Here, `as_of_ts` identifies the prediction time, while `day` identifies the selected feature snapshot. The model learns from the feature columns to predict `label`. This simple example has no same-day future events included because neither selected day has events after the prediction time.
+
+| user_id | label | as_of_ts | day | event_count_7d | event_count_30d | last_event_days_ago | event_type_counts |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| user1 | 1.0 | Jan 2, 18:00 | Jan 2 | 1 | 1 | 1 | "1" |
+| user1 | 0.0 | Jan 4, 18:00 | Jan 4 | 2 | 2 | 1 | "2" |
+
+However, the current date-based join would also include later events on those days if they existed, so same-day leakage remains possible. This example also doesn’t establish whether the snapshots were actually available at prediction time.
+
+Coming back to real-world use cases, the key to avoiding leakage is defining **when a feature’s window ends and when its value becomes available**. A common pattern is a timestamp-based **as-of join**: select the latest eligible feature value at or before the prediction time. Both [Feast](https://docs.feast.dev/getting-started/concepts/point-in-time-joins) and [Databricks](https://docs.databricks.com/aws/en/machine-learning/feature-store/time-series) support timestamp-based historical lookups; availability handling also needs to be considered in the pipeline design.
+
+For our case, a snapshot with `day = Jan 3` includes events throughout that whole day. We can update the feature table to give snapshots explicit timestamps: keep `day` for partitioning, **add `window_end_ts` for the exclusive event cutoff**, and **add `available_at` for when that feature version became usable**. The join would then select the latest eligible snapshot whose window had ended and whose value was available by `as_of_ts`.
+
+That’s it for the offline feature store for now. In the next part, I’ll walk through the online store and how we serve these features for real-time predictions. To be continued!
