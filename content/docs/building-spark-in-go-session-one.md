@@ -14,7 +14,7 @@ I’m building Spark’s core execution architecture in Go to explore the system
 
 Let’s look at how a submitted job becomes executable tasks.
 
-{{< figure src="images/spark/decompositoinSketch.png" alt="Spark execution workflow decomposition sketch" >}}
+{{< figure src="images/spark/execution-workflow.svg" link="/images/spark/execution-workflow.svg" alt="Spark execution workflow showing RDD lineage, stage generation, a shuffle boundary, partition tasks, task scheduling, and worker execution" >}}
 
 Session one focuses on building an MVP Spark execution engine while exploring RDD lineage, lazy evaluation, narrow and shuffle dependencies, and partition-level tasks. Execution focuses on narrow transformations within a single process, without distributed execution.
 
