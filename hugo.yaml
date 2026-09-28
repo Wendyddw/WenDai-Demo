@@ -1,6 +1,6 @@
 baseURL: "https://wendai.dev/"
 languageCode: en-us
-title: "Wen Dai | Dev Playground"
+title: "Wen Dai | Dev Sandbox"
 theme: PaperMod
 
 enableEmoji: true
@@ -12,9 +12,9 @@ params:
     favicon32x32: "/favicon-32x32.png"
     apple_touch_icon: "/apple-touch-icon.png"
   homeInfoParams:
-    Title: "The dev playground"
+    Title: "The dev sandbox"
     Content: >
-      Hi, I’m Wen. Welcome to my **dev playground**.
+      Hi, I’m Wen. Welcome to my **dev sandbox**.
 
       - A space where I share what I’m learning and building with Spark, data engineering, and distributed systems.
 
