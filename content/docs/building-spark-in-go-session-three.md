@@ -57,7 +57,7 @@ The reducer count is configured before execution. The writer assigns records to 
 
 Publish atomically makes the completed map output available. Each attempt uses a distinct path, so retries do not overwrite earlier output.
 
-Code: executor/shuffle_map.go, shuffle/writer.go, shuffle/partitioner.go.
+Code: [executor/shuffle_map.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/shuffle_map.go), [shuffle/writer.go](https://github.com/Wendyddw/sparkcore-go/blob/main/shuffle/writer.go), [shuffle/partitioner.go](https://github.com/Wendyddw/sparkcore-go/blob/main/shuffle/partitioner.go).
 
 2\. Workers report published output metadata
 
@@ -74,7 +74,7 @@ The worker sends metadata identifying the published output, including its attemp
 
 Publication and acceptance are separate: a file can exist without becoming an accepted input for reducers.
 
-Code: worker/task.go, coordinator/task_report.go.
+Code: [worker/task.go](https://github.com/Wendyddw/sparkcore-go/blob/main/worker/task.go), [coordinator/task_report.go](https://github.com/Wendyddw/sparkcore-go/blob/main/coordinator/task_report.go).
 
 3\. Schedulers accept map outputs and enforce the stage barrier
 
@@ -95,7 +95,7 @@ onMapSuccess(report):
 
 Reducers start only after all map outputs are accepted. Their input snapshot identifies the exact outputs to read—they do not scan directories to discover files.
 
-Code: scheduler/fifo_task_scheduler.go, scheduler/dag_scheduler.go, scheduler/dag_stage_execution.go.
+Code: [scheduler/fifo_task_scheduler.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/fifo_task_scheduler.go), [scheduler/dag_scheduler.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/dag_scheduler.go), [scheduler/dag_stage_execution.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/dag_stage_execution.go).
 
 4\. Each reducer reads its bucket from every accepted map output
 
@@ -114,7 +114,7 @@ for mapOutput := range inputs.Outputs {
 
 Reduce task 0 reads bucket 0 from every accepted map output. Reduce task 1 reads bucket 1, and so on. The reader validates bucket contents as they are consumed.
 
-Code: executor/shuffle_read.go.
+Code: [executor/shuffle_read.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/shuffle_read.go).
 
 5\. ReduceByKey aggregates records by key
 
@@ -136,7 +136,7 @@ return recordsSortedByKey(values)
 
 For a sum operation, reduce(previous, current) adds the values. Different keys can share a bucket, so the reducer still groups records by their actual keys.
 
-Code: executor/reduce.go.
+Code: [executor/reduce.go](https://github.com/Wendyddw/sparkcore-go/blob/main/executor/reduce.go).
 
 This wraps up the shuffle implementation. Going through these steps, we can see why redistributing data is expensive: it brings together several potential system bottlenecks, including network transfers between mapper and reducer nodes, intermediate disk reads and writes, and data serialization and deserialization. (Our shared-filesystem setup simplifies the transfer mechanism, so it does not reproduce all of these costs in the same way.)
 
@@ -148,4 +148,4 @@ Our implementation keeps combining and reduction in memory and does not implemen
 
 Along with shuffle execution, we also need to handle workers that stop reporting. Workers register with the coordinator and send periodic heartbeats. A background monitor in the coordinator triggers the scheduler’s expiry check; if a worker has been silent beyond the timeout, the scheduler marks it lost and requeues its unfinished tasks while the retry budget allows. Fresh attempt IDs keep late reports from changing accepted results. Since we use shared storage, accepted shuffle outputs can survive worker termination. If an accepted output later becomes missing or corrupt, the DAG scheduler uses a separate stage-recovery budget to rerun the full map stage and then the result stage. This gives us two recovery paths: retry unfinished work after worker loss, and regenerate shuffle data when accepted input becomes unavailable.
 
-Code: coordinator/worker_monitor.go, scheduler/worker_expiry.go, scheduler/dag_recovery.go.
+Code: [coordinator/worker_monitor.go](https://github.com/Wendyddw/sparkcore-go/blob/main/coordinator/worker_monitor.go), [scheduler/worker_expiry.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/worker_expiry.go), [scheduler/dag_recovery.go](https://github.com/Wendyddw/sparkcore-go/blob/main/scheduler/dag_recovery.go).
