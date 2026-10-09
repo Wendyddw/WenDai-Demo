@@ -80,7 +80,7 @@ Code: [worker/task.go](https://github.com/Wendyddw/sparkcore-go/blob/main/worker
 
 The FIFO task scheduler validates reports against assigned attempts before notifying the DAG scheduler. The DAG scheduler tracks accepted outputs for the current stage attempt.
 
-```text
+```go
 onMapSuccess(report):
     if report is stale or already accepted:
         return
