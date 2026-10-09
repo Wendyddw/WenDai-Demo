@@ -1,0 +1,23 @@
+flowchart LR
+    MA["Map A"]
+    MB["Map B"]
+
+    subgraph FS["Shared filesystem"]
+        A0["A: bucket 0"]
+        B0["B: bucket 0"]
+        A1["A: bucket 1"]
+        B1["B: bucket 1"]
+    end
+
+    R0["Reduce task 0 → apple: 5"]
+    R1["Reduce task 1 → banana: 5"]
+
+    MA -->|Write| A0
+    MA -->|Write| A1
+    MB -->|Write| B0
+    MB -->|Write| B1
+
+    A0 -->|Read| R0
+    B0 -->|Read| R0
+    A1 -->|Read| R1
+    B1 -->|Read| R1
