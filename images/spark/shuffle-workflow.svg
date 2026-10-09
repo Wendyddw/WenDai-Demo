@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Shuffle workflow</title>
+  <desc id="desc">Map A writes A: bucket 0 and A: bucket 1. Map B writes B: bucket 0 and B: bucket 1. All buckets live on a shared filesystem. Reduce task 0 reads both bucket 0 files and produces apple: 5. Reduce task 1 reads both bucket 1 files and produces banana: 5.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/></marker>
+  </defs>
+  <style>
+    text { font-family: Arial, sans-serif; font-size: 18px; fill: #222; text-anchor: middle; }
+    .node { fill: #eee; stroke: #777; stroke-width: 1.5; }
+    .edge { fill: none; stroke: #555; stroke-width: 1.7; marker-end: url(#arrow); }
+    .label { font-size: 16px; paint-order: stroke; stroke: white; stroke-width: 7px; stroke-linejoin: round; }
+  </style>
+  <rect width="960" height="500" fill="white"/>
+  <rect x="350" y="25" width="230" height="450" fill="#fafafa" stroke="#aaa"/>
+  <text x="465" y="59" font-weight="600">Shared filesystem</text>
+  <path class="edge" d="M 150 155 L 385 120"/>
+  <path class="edge" d="M 150 155 L 385 330"/>
+  <path class="edge" d="M 150 365 L 385 210"/>
+  <path class="edge" d="M 150 365 L 385 420"/>
+  <path class="edge" d="M 545 120 L 670 165"/>
+  <path class="edge" d="M 545 210 L 670 165"/>
+  <path class="edge" d="M 545 330 L 670 375"/>
+  <path class="edge" d="M 545 420 L 670 375"/>
+  <text class="label" x="250" y="133">Write</text>
+  <text class="label" x="240" y="215">Write</text>
+  <text class="label" x="240" y="296">Write</text>
+  <text class="label" x="250" y="382">Write</text>
+  <text class="label" x="615" y="136">Read</text>
+  <text class="label" x="615" y="201">Read</text>
+  <text class="label" x="615" y="346">Read</text>
+  <text class="label" x="615" y="411">Read</text>
+  <rect class="node" x="30" y="125" width="120" height="60"/>
+  <text x="90" y="162">Map A</text>
+  <rect class="node" x="30" y="335" width="120" height="60"/>
+  <text x="90" y="372">Map B</text>
+  <rect class="node" x="385" y="95" width="160" height="50"/>
+  <text x="465" y="127">A: bucket 0</text>
+  <rect class="node" x="385" y="185" width="160" height="50"/>
+  <text x="465" y="217">B: bucket 0</text>
+  <rect class="node" x="385" y="305" width="160" height="50"/>
+  <text x="465" y="337">A: bucket 1</text>
+  <rect class="node" x="385" y="395" width="160" height="50"/>
+  <text x="465" y="427">B: bucket 1</text>
+  <rect class="node" x="670" y="135" width="260" height="60"/>
+  <text x="800" y="172">Reduce task 0 → apple: 5</text>
+  <rect class="node" x="670" y="345" width="260" height="60"/>
+  <text x="800" y="382">Reduce task 1 → banana: 5</text>
+</svg>
