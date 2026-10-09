@@ -120,7 +120,7 @@ Code: [executor/shuffle_read.go](https://github.com/Wendyddw/sparkcore-go/blob/m
 
 The shuffle-read iterator feeds a separate aggregation step:
 
-```text
+```go
 values := map[Key]Value{}
 
 for record := range shuffleReadIterator {
