@@ -140,7 +140,7 @@ Code: [executor/reduce.go](https://github.com/Wendyddw/sparkcore-go/blob/main/ex
 
 This wraps up the shuffle implementation. Going through these steps, we can see why redistributing data is expensive: it brings together several potential system bottlenecks, including network transfers between mapper and reducer nodes, intermediate disk reads and writes, and data serialization and deserialization. (Our shared-filesystem setup simplifies the transfer mechanism, so it does not reproduce all of these costs in the same way.)
 
-Out-of-memory errors can also happen during shuffle execution. On the map side, sorting and aggregation can put pressure on memory. Spark can spill intermediate structures to disk, so the entire map output does not have to fit in memory at once. On the reducer side, uneven key distribution can create skewed partitions. For example, when many records share a null key—and leave one task with a disproportionate amount of work.
+It’s common to observe OOM error during shuffle execution. On the map side, sorting and aggregation can put pressure on memory. Spark can spill intermediate structures to disk, so the entire map output does not have to fit in memory at once. On the reducer side, uneven key distribution can create skewed partitions. For example, when many records share a null key—and leave one task with a disproportionate amount of work.
 
 Our implementation keeps combining and reduction in memory and does not implement spilling. This exercise helps me strengthen my understanding of the shuffle workflow and avoid some common mistakes in the future.
 
